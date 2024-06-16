@@ -14,7 +14,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ onLogout }) => {
 
       <div>
         <p className="text-sm font-medium">Willam</p>
-        <button className="text-sm text-slate-700 underline" onClick={onLogout}>
+        <button className="text-sm  underline" onClick={onLogout}>
           Logout
         </button>
       </div>
