@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import TagInput from "../../components/Input/TagInput";
 import { MdClose } from "react-icons/md";
+import axiosInstance from "../../utils/axiosInstance";
 
 interface AddEditNotesProps {
   onClose: () => void;
@@ -8,25 +9,55 @@ interface AddEditNotesProps {
   type: "add" | "edit"; // Define type as a string with specific values
 }
 
-const AddEditNotes: React.FC<AddEditNotesProps> = ({ noteData, type, onClose }) => {
-  const [title, setTitle] = useState<string>("");
-  const [content, setContent] = useState<string>("");
-  const [tags, setTags] = useState<string[]>([]);
+const AddEditNotes: React.FC<AddEditNotesProps> = ({ noteData, type, getAllNotes, onClose }) => {
+  const [title, setTitle] = useState(noteData?.title || "");
+  const [content, setContent] = useState(noteData?.content || "");
+  const [tags, setTags] = useState(noteData?.tags || []);
 
   const [error, setError] = useState<string | null>(null);
 
   // Add Note
   const addNewNote = async () => {
-    // Add logic to handle adding a new note
     noteData({ title, content, tags });
-    onClose();
+    try {
+      const response = await axiosInstance.post("/add-note", {
+        title,
+        content,
+        tags,
+      });
+
+      if (response.data && response.data.note) {
+        getAllNotes();
+        onClose();
+      }
+    } catch (error) {
+      if (error.responde && error.response.data && error.response.data.message) {
+        setError(error.response.data.message);
+      }
+    }
   };
 
   // Edit Note
   const editNote = async () => {
-    // Add logic to handle editing an existing note
-    noteData({ title, content, tags });
-    onClose();
+    const noteId = noteData._id;
+
+    // noteData({ title, content, tags });
+    try {
+      const response = await axiosInstance.put("/edit-note/" + noteId, {
+        title,
+        content,
+        tags,
+      });
+
+      if (response.data && response.data.note) {
+        getAllNotes();
+        onClose();
+      }
+    } catch (error) {
+      if (error.responde && error.response.data && error.response.data.message) {
+        setError(error.response.data.message);
+      }
+    }
   };
 
   const handleAddNote = () => {
@@ -88,7 +119,7 @@ const AddEditNotes: React.FC<AddEditNotesProps> = ({ noteData, type, onClose }) 
         {error && <p className="text-red-500 text-xs pt-4">{error}</p>}
 
         <button className="btn-primary font-medium mt-5 p-3" onClick={handleAddNote}>
-          {type === "edit" ? "EDIT" : "ADD"}
+          {type === "edit" ? "UPDATE" : "ADD"}
         </button>
       </div>
     </div>
