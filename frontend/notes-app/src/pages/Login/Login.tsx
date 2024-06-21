@@ -1,13 +1,16 @@
 import React, { useState, FormEvent } from "react";
 import Navbar from "../../components/Navbar/Navbar";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PasswordInput from "../../components/Input/PasswordInput";
 import { validateEmail } from "../../utils/helper"; // Certifique-se de que o caminho para helper está correto
+import axiosInstance from "../../utils/axiosInstance";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+
+  const navigate = useNavigate()
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
@@ -25,7 +28,25 @@ const Login: React.FC = () => {
     setError("")
 
     //Login API Call
+    try {
+      const response = await axiosInstance.post("/login", {
+        email: email,
+        password: password,
+      });
 
+      if(response.data && response.data.accessToken){
+        localStorage.setItem("token", response.data.accessToken)
+        navigate('/dashboard');
+      }
+
+    } catch (error) {
+      // Handle login error
+      if (error.response && error.response.data && error.response.data.message) {
+        setError(error.response.data.message);
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
+    }
   };
 
   return (

@@ -4,19 +4,31 @@ import ProfileInfo from '../Cards/ProfileInfo';
 import SearchBar from '../SearchBar/SearchBar';
 import useThemeStore from '../../useThemeStore';
 
-const Navbar: React.FC = () => {
+interface NavbarProps {
+    userInfo: {
+      fullName: string;
+    };
+  }
+
+const Navbar: React.FC<NavbarProps> = ({ userInfo, onSearchNote, handleClearSearch }) => {
     const [searchQuery, setSearchQuery] = useState("");
     const navigate = useNavigate();
     const { theme, toggleTheme } = useThemeStore();
 
     const onLogout = () => {
+        localStorage.clear();
         navigate("/login");
     };
 
-    const handleSearch = () => {};
+    const handleSearch = () => {
+       if(searchQuery) {
+        onSearchNote(searchQuery)
+       }
+    };
 
     const onClearSearch = () => {
         setSearchQuery("");
+        handleClearSearch();
     };
 
     // Aplicar a classe de tema no body
@@ -36,7 +48,6 @@ const Navbar: React.FC = () => {
                 handleSearch={handleSearch}
                 onClearSearch={onClearSearch}
             />
-
             <div className="flex items-center">
                 <button
                     className="mr-4 p-2 rounded-md border"
@@ -44,7 +55,7 @@ const Navbar: React.FC = () => {
                 >
                     Alternar Tema
                 </button>
-                <ProfileInfo onLogout={onLogout} />
+                <ProfileInfo userInfo={userInfo} onLogout={onLogout} />
             </div>
         </div>
     );
