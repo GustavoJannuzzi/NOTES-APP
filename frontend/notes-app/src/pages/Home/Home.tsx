@@ -7,17 +7,17 @@ import axiosInstance from "../../utils/axiosInstance";
 import Navbar from "../../components/Navbar/Navbar";
 import { useNavigate } from "react-router-dom";
 import AddEditNotes from "./AddEditNotes";
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MdAdd } from "react-icons/md";
 import Modal from "react-modal";
+import useThemeStore from "../../useThemeStore"; // Importando o store do tema
 
-
-const Home = () => {
-
-  const[openAddEditModal, setOpenAddEditModal] = useState({
-    isShow:false,
-    type:"add",
-    data:null,
+const Home: React.FC = () => {
+  const { theme, toggleTheme } = useThemeStore(); // Usando o estado do tema
+  const [openAddEditModal, setOpenAddEditModal] = useState({
+    isShow: false,
+    type: "add",
+    data: null,
   });
 
   const [showToastMsg, setShowToastMsg] = useState({
@@ -167,10 +167,11 @@ const Home = () => {
   }
 
   useEffect(() => {
+    document.body.className = theme;
     getAllNotes();
     getUserInfo();
     return () => {};
-  }, []);
+  }, [theme]);
 
   return (
     <>
@@ -242,24 +243,27 @@ const Home = () => {
         )}
       </div>
 
-      <button className="w-16 h-16 flex items-center justify-center rounded-2xl bg-primary hover:bg-blue-600 absolute right-10 bottom-10"
-       onClick={() => {
-        setOpenAddEditModal({ isShow:true, type: "add", data: null});
-       }}
-       >
-        <MdAdd className="text-[32px] text-white"/>
+      <button
+        className="w-16 h-16 flex items-center justify-center rounded-2xl bg-primary hover:bg-blue-600 absolute right-10 bottom-10"
+        onClick={() => {
+          setOpenAddEditModal({ isShow: true, type: "add", data: null });
+        }}
+      >
+        <MdAdd className="text-[32px] text-white" />
       </button>
 
       <Modal
-      isOpen={openAddEditModal.isShow}
-      onRequestClose={() => {}}
-      style={{
-        overlay: {
-          backgroundColor: "rgba(0,0,0,0.2)",
-        },
-      }}
-      contentLabel=""
-      className="w-[40%] max-h-3/4 bg-white rounded-md mx-auto mt-14 p-5 overflow-sroll"
+        isOpen={openAddEditModal.isShow}
+        onRequestClose={() => {
+          setOpenAddEditModal({ isShow: false, type: "add", data: null });
+        }}
+        style={{
+          overlay: {
+            backgroundColor: "rgba(0,0,0,0.2)",
+          },
+        }}
+        contentLabel=""
+        className="w-[40%] max-h-3/4 bg-white rounded-md mx-auto mt-14 p-5 overflow-sroll"
       >
         <AddEditNotes
           type={openAddEditModal.type}
