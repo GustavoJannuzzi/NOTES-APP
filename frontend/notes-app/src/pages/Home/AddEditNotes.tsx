@@ -5,11 +5,13 @@ import axiosInstance from "../../utils/axiosInstance";
 
 interface AddEditNotesProps {
   onClose: () => void;
-  noteData: (data: { title: string; content: string; tags: string[] }) => void; // Define the correct type for noteData
-  type: "add" | "edit"; // Define type as a string with specific values
+  noteData: { title: string; content: string; tags: string[];_id?: string } | null;
+  type: "add" | "edit";
+  getAllNotes: () => void;
+  showToastMessage: (message: string) => void;
 }
 
-const AddEditNotes: React.FC<AddEditNotesProps> = ({ noteData, type, getAllNotes, onClose }) => {
+const AddEditNotes: React.FC<AddEditNotesProps> = ({ noteData, type, getAllNotes, onClose, showToastMessage }) => {
   const [title, setTitle] = useState(noteData?.title || "");
   const [content, setContent] = useState(noteData?.content || "");
   const [tags, setTags] = useState(noteData?.tags || []);
@@ -18,7 +20,6 @@ const AddEditNotes: React.FC<AddEditNotesProps> = ({ noteData, type, getAllNotes
 
   // Add Note
   const addNewNote = async () => {
-    noteData({ title, content, tags });
     try {
       const response = await axiosInstance.post("/add-note", {
         title,
@@ -27,6 +28,7 @@ const AddEditNotes: React.FC<AddEditNotesProps> = ({ noteData, type, getAllNotes
       });
 
       if (response.data && response.data.note) {
+        showToastMessage("Note Added Successfully");
         getAllNotes();
         onClose();
       }
@@ -39,7 +41,7 @@ const AddEditNotes: React.FC<AddEditNotesProps> = ({ noteData, type, getAllNotes
 
   // Edit Note
   const editNote = async () => {
-    const noteId = noteData._id;
+    const noteId = noteData?._id;
 
     // noteData({ title, content, tags });
     try {
@@ -50,6 +52,7 @@ const AddEditNotes: React.FC<AddEditNotesProps> = ({ noteData, type, getAllNotes
       });
 
       if (response.data && response.data.note) {
+        showToastMessage("Note Updated Successfully");
         getAllNotes();
         onClose();
       }

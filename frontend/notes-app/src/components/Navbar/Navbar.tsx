@@ -9,7 +9,7 @@ interface NavbarProps {
     };
   }
 
-const Navbar: React.FC<NavbarProps> = ({ userInfo }) => {
+const Navbar: React.FC<NavbarProps> = ({ userInfo, onSearchNote, handleClearSearch }) => {
     const [searchQuery, setSearchQuery] = useState("");
     
     const navigate = useNavigate();
@@ -19,10 +19,15 @@ const Navbar: React.FC<NavbarProps> = ({ userInfo }) => {
         navigate("/login");
     };
 
-    const handleSearch = () => {};
+    const handleSearch = () => {
+       if(searchQuery) {
+        onSearchNote(searchQuery)
+       }
+    };
 
     const onClearSearch = ()=>{
         setSearchQuery("");
+        handleClearSearch();
     };
 
     return (
